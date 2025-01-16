@@ -1,0 +1,36 @@
+# Node.js dependencies
+/node_modules/
+
+#Worker Files
+src/tokens  
+src/temp
+
+# TypeScript output directory
+dist    
+
+/# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+*.log
+logs/
+
+# npm package-lock and yarn lock files
+package-lock.json
+yarn.lock
+
+# IDE/editor specific files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Build and runtime files
+*.tsbuildinfo
+*.swp
