@@ -2,9 +2,10 @@ import WebSocket from 'ws';
 import config from '../config';
 import { IncomingMessage } from 'http';
 
-const handleMessage = (task:string,client:WebSocket & IncomingMessage)=>{
+const handleMessage = (task:string,client:WebSocket)=>{
     console.log("Receiving messages from server ::: ");
-    client.send(`You have requested the folowing ::: ${task}`);    
+    console.log("Current Message Received ::: ",task);   
+    //client.send(`You have requested the folowing ::: ${task}`);    
 }
 
 const initiateGridSocket = ()=>{
@@ -13,8 +14,9 @@ const initiateGridSocket = ()=>{
 
     socket.on('connection',(client)=>{
 
-        client.on('message',(message:string,client :WebSocket & IncomingMessage)=>{
-            handleMessage(message,client);
+        client.on('message',(message:string)=>{
+            handleMessage(message.toString(),client);   
+            client.send("Welcome to the following order");   
         });
 
         client.on('error',(err:Error)=>{
