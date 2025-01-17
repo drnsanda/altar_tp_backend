@@ -75,68 +75,78 @@ export const authUserService = async (email:string,securityAccess:string)=>{
 }
 
 
-export const generateGridService = async (bias:string): Promise<{html:string}|ServiceError> => {    
-  try{  
-    const GRID_LAYOUT_SIZE=10;
-    const GRID_LAYOUT_TOTAL=GRID_LAYOUT_SIZE*GRID_LAYOUT_SIZE;
-    let _output = "";
-    const letters = [];
+export const generateGridService = (bias?: string): { html: string } | ServiceError => {
+  try {
+    const GRID_LAYOUT_SIZE = 10;
+    const GRID_LAYOUT_TOTAL = GRID_LAYOUT_SIZE * GRID_LAYOUT_SIZE;
 
+    // Generate a random letter, avoiding bias if provided
     const getRandomLetter = (): string => {
-      let randomCode = Math.floor(Math.random() * 26) + 97;
-      if(bias?.length > 0 && randomCode===bias?.charCodeAt(0)){
-        while (randomCode===bias?.charCodeAt(0)){
-          randomCode = Math.floor(Math.random()*26) + 97;
-        }
+      let randomCode = Math.floor(Math.random() * 26) + 97; // 'a' to 'z'
+      const biasCode = bias?.charCodeAt(0);
+
+      while (bias && randomCode === biasCode) {
+        randomCode = Math.floor(Math.random() * 26) + 97;
       }
       return String.fromCharCode(randomCode);
     };
 
-    for(let index=0;index < GRID_LAYOUT_TOTAL; index++){
-      letters.push(getRandomLetter());
-    }
+    // Generate the initial grid of letters
+    const letters = Array.from({ length: GRID_LAYOUT_TOTAL }, getRandomLetter);
 
-    if(bias?.length>0){
-      for(let index=0;index < 20; index++){
-        let position = Math.floor(Math.random() * GRID_LAYOUT_TOTAL);
-        while(letters[position]===bias){
-          position = Math.floor(Math.random() * GRID_LAYOUT_TOTAL);
+    // Randomly replace letters with the bias letter (up to 20 times)
+    if (bias) {
+      const biasPositions = new Set<number>();
+      const maxBiasCount = 20;
+
+      while (biasPositions.size < maxBiasCount) {
+        const position = Math.floor(Math.random() * GRID_LAYOUT_TOTAL);
+        if (letters[position] !== bias) {
+          biasPositions.add(position);
+          letters[position] = bias;
         }
-        letters[position]=bias;
-      }     
+      }
     }
-    let rowBreaker = 0;
-    for(let index=0;index < GRID_LAYOUT_TOTAL; index++){
-      _output+=`
-      ${rowBreaker===0 ? `<div style="display:inline-flex;border-bottom:1px solid #000000;${index===0 ? 'border-top:1px solid #000000;' : ''}">`: ""}
-      <span 
-      style='
-      padding:15px 30px;
-      display:inline-flex;
-      justify-content:center;
-      align-items:center;
-      height:20px;
-      width:20px;
-      border-left:1px solid #000;
-      ${rowBreaker+1===10 ? 'border-right:1px solid #000000;': ''}
-      ${letters[index]===bias ? 'background-color:blue;' : ''}
-      '
-      ${letters[index]===bias ? 'class="highlight"' : ''}
-      >${letters[index]}</span>`  
-      
-      if(rowBreaker + 1 === 10){    
-        rowBreaker=0;
-        _output+="</div>"
-      }else{
-        rowBreaker++;     
-      }   
-    }     
 
-    return{
-      html: `<div class='live-grid-view'>${_output}</div>`
-    }   
-    
-  }catch(error:any){    
+    // Generate the HTML grid
+    const rows = [];
+    for (let row = 0; row < GRID_LAYOUT_SIZE; row++) {
+      const cells = [];
+      for (let col = 0; col < GRID_LAYOUT_SIZE; col++) {
+        const index = row * GRID_LAYOUT_SIZE + col;
+        const isBias = letters[index] === bias;
+
+        cells.push(`
+          <span 
+            style="
+              padding: 15px 30px;
+              display: inline-flex;
+              justify-content: center;
+              align-items: center;
+              height: 20px;
+              width: 20px;
+              border-left: 1px solid #000;
+              ${col === GRID_LAYOUT_SIZE - 1 ? 'border-right: 1px solid #000;' : ''}
+              ${isBias ? 'background-color: blue;' : ''}
+            "
+            ${isBias ? 'class="highlight"' : ''}
+          >
+            ${letters[index]}
+          </span>
+        `);
+      }
+
+      rows.push(`
+        <div style="display: inline-flex; border-bottom: 1px solid #000; ${row === 0 ? 'border-top: 1px solid #000;' : ''}">
+          ${cells.join('')}
+        </div>
+      `);
+    }
+
+    return {
+      html: `<div class="live-grid-view">${rows.join('')}</div>`,
+    };
+  } catch (error: any) {
     return getServiceError(error);
-  } 
-};    
+  }
+};
