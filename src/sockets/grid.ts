@@ -55,13 +55,6 @@ const initiateGridSocket = ()=>{
             client.send(JSON.stringify({status:"close",message:'Connection has been closed'}));  
         });
     });    
-    
-    socket.on('update_clients',(client)=>{
-        client.send(JSON.stringify({status:"updating"}));
-        client.send(JSON.stringify({status:"fetching",html:grid._html,clientsConnected:grid.clients}));
-        console.log("Updating clients ::: ");   
-    });
- 
 
     socket.on('error',(err)=>{
         console.log("Failed to initiate Grid Socket ::: ",err.message);  
