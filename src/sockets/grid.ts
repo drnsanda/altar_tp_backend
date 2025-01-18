@@ -2,18 +2,33 @@ import WebSocket from 'ws';
 import config from '../config';
 import { generateGridService } from '../services/userService';  
 
-const grid = {
+const grid:{
+  clients:number;
+  _html:string;
+  bias:Array<string>
+} = {
     _html: "",
-    clients:0
+    clients:0,
+    bias:[] //CUE HOLDER FOR CLIENTS
 }
 
-const handleMessage = (task:string,client:WebSocket)=>{
-   if(task==='connect'){   
+const handleMessage = (payload:string,client:WebSocket)=>{
+    let task:Partial<{code:string,data:any}> = {code:"",data:{}};
+    try{
+      task = JSON.parse(payload);   
+    }catch(error){
+      task={};
+      console.error("INVALID_FORMAT_ATTEMPT");
+    }
+   if(task.code==='connect'){  
     grid.clients+=1;    
    }
-   else if(task==='disconnect'){
+   else if(task?.code==='disconnect'){
     grid.clients-=1;   
    }
+   else if(task?.code==='bias'){
+    grid.bias.push(task?.data);
+   }   
 }       
 const broadcast = (socket:WebSocket.Server,data: string) => {
     socket.clients.forEach((client:WebSocket) => {
@@ -22,14 +37,21 @@ const broadcast = (socket:WebSocket.Server,data: string) => {
       }
     });
   };
-//TODO: Handle Debouncing and Time Response
+
 const startLiveGrid = (socket: WebSocket.Server) => {    
-    setInterval(() => {
+    setInterval(() => {   
       setTimeout(() => {
         broadcast(socket, JSON.stringify({ status: "updating" }));
       }, 1000 * (config.gridRefreshTime - 1)); 
-  
-      const result = generateGridService("h");
+
+      let result:any = {};
+
+      if(grid?.bias?.length > 0){
+        result = generateGridService(grid.bias.shift()?.toLowerCase());    
+      }else{
+        result = generateGridService();
+      }     
+      
       if ("error" in result) {
         console.error("Failed to generate grid");
       } else if (typeof result?.html === "string") {
