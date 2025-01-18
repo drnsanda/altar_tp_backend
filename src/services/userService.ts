@@ -75,7 +75,7 @@ export const authUserService = async (email:string,securityAccess:string)=>{
 }
 
 
-export const generateGridService = (bias?: string): { html: string } | ServiceError => {
+export const generateGridService = (bias?: string): { html: string, raw:string[] } | ServiceError => {
   try {
     const GRID_LAYOUT_SIZE = 10;
     const GRID_LAYOUT_TOTAL = GRID_LAYOUT_SIZE * GRID_LAYOUT_SIZE;
@@ -119,7 +119,7 @@ export const generateGridService = (bias?: string): { html: string } | ServiceEr
         cells.push(`
           <span 
             style="
-              padding: 15px 30px;
+              padding: 30px 55px;
               display: inline-flex;
               justify-content: center;
               align-items: center;
@@ -129,7 +129,7 @@ export const generateGridService = (bias?: string): { html: string } | ServiceEr
               ${col === GRID_LAYOUT_SIZE - 1 ? 'border-right: 1px solid #000;' : ''}
               ${isBias ? 'background-color: blue;' : ''}
             "
-            ${isBias ? 'class="highlight"' : ''}
+            ${isBias ? 'data-bg="highlight"' : ''}
           >
             ${letters[index]}
           </span>
@@ -144,7 +144,8 @@ export const generateGridService = (bias?: string): { html: string } | ServiceEr
     }
 
     return {
-      html: `<div class="live-grid-view">${rows.join('')}</div>`,
+      html: `${rows.join('')}`,
+      raw: letters
     };
   } catch (error: any) {
     return getServiceError(error);

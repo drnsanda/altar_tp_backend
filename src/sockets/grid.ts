@@ -1,7 +1,6 @@
 import WebSocket from 'ws';
 import config from '../config';
-import { generateGridService } from '../services/userService';
-import { IncomingMessage } from 'http';
+import { generateGridService } from '../services/userService';  
 
 const grid = {
     _html: "",
@@ -24,19 +23,26 @@ const broadcast = (socket:WebSocket.Server,data: string) => {
     });
   };
 //TODO: Handle Debouncing and Time Response
-const startLiveGrid = (socket:WebSocket.Server)=>{         
-    setInterval(()=>{
-        const result= generateGridService();
-        if('error' in result){
-            console.error("Failed to generate grid");
-        }
-        else if(typeof result?.html === 'string'){
-            grid._html=result?.html;          
-        } 
-        broadcast(socket,JSON.stringify({status:"updating"}));
-        broadcast(socket,JSON.stringify({status:"fetching",html:grid._html,clientsConnected:grid.clients}));   
-    },1000*(config.gridRefreshTime));    
-}
+const startLiveGrid = (socket: WebSocket.Server) => {    
+    setInterval(() => {
+      setTimeout(() => {
+        broadcast(socket, JSON.stringify({ status: "updating" }));
+      }, 1000 * (config.gridRefreshTime - 1)); 
+  
+      const result = generateGridService("h");
+      if ("error" in result) {
+        console.error("Failed to generate grid");
+      } else if (typeof result?.html === "string") {
+        grid._html = result.html;
+        broadcast(socket, JSON.stringify({ 
+          status: "fetching", 
+          html: grid._html, 
+          raw: result?.raw,
+          clientsConnected: grid.clients    
+        }));
+      }
+    }, 1000 * config.gridRefreshTime);
+  };
 
 const initiateGridSocket = ()=>{
     const socket = new WebSocket.Server({port: config.gridSocketPort});
@@ -53,6 +59,8 @@ const initiateGridSocket = ()=>{
 
         client.on('close',()=>{
             client.send(JSON.stringify({status:"close",message:'Connection has been closed'}));  
+            grid.clients-=1;
+            //TODO: Handle disconnect of client
         });
     });    
 
