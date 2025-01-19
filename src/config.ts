@@ -16,6 +16,11 @@ const handleToNumberConversion = (_input:any,_default:number) => {
     const _number = parseInt(_input);
     return isNaN(_number) ? _default : _number;
 }
+
+if (process.env.TP_NODE_ENV !== "production") {
+    require("dotenv").config();
+}
+
 const environments:{[key:string] : EnvironmentProfile} = {
 
     staging: {
