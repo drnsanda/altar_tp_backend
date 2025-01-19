@@ -5,6 +5,7 @@ import { createPaymentsService, getPaymentsHTMLService } from '../services/payme
 import { generateGridService } from '../services/gridService';
 import { ServiceError } from '../interfaces/errors';
 import { IncomingMessage } from 'http';
+import { server } from '../index';
 
 const grid: {
   clients: number;
@@ -137,7 +138,7 @@ const verifyClientAuthentication = (client:WebSocket,req:IncomingMessage)=>{
 }
 
 const initiateGridSocket = () => {
-  const socket = new WebSocket.Server({ port: config.gridSocketPort });
+  const socket = new WebSocket.Server({ server:server });
   console.log('\x1b[35m::: [SOCKETS_GRID_INITIALIZED] :::\x1b[0m');
   startLiveGrid(socket);
   startLivePayments(socket);

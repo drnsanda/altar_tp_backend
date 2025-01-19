@@ -5,14 +5,16 @@ import bodyParser from 'body-parser';
 import workers from './workers';  
 import cors, { CorsOptions } from 'cors';
 import sockets from './sockets';
+import http from 'http';
 const app = express();
 
 const corsOptions: CorsOptions = {
     origin: [config.baseFrontendUrl] //Whitelist Configuration       
 }
     
+export const server = http.createServer(app);
 //Initialize Server
-app.listen(config.port,()=>{
+server.listen(config.port,()=>{
     //Primary Middlewares
     app.use(bodyParser.json());   
     
@@ -32,4 +34,4 @@ app.listen(config.port,()=>{
     
 });
 
-export default app;    
+export default app;       

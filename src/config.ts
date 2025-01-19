@@ -25,7 +25,7 @@ const environments:{[key:string] : EnvironmentProfile} = {
 
     staging: {
         environment: 'staging',
-        port: handleToNumberConversion(process.env.TP_PORT,3200),
+        port: handleToNumberConversion(process.env.PORT,3200),
         gridSocketPort: handleToNumberConversion(process.env.TP_GRID_SOCKET_PORT,3210),    
         hashSecretKey: process.env.TP_HASH_SECRET_KEY || "checkers",
         tokenExpirationTime: handleToNumberConversion(process.env.TP_TOKEN_EXPIRATION_TIME,15),
@@ -36,7 +36,7 @@ const environments:{[key:string] : EnvironmentProfile} = {
     },
     production:{
         environment:'production',
-        port: handleToNumberConversion(process.env.TP_PORT,5000),
+        port: handleToNumberConversion(process.env.PORT,5000),
         gridSocketPort: handleToNumberConversion(process.env.TP_GRID_SOCKET_PORT,5010),        
         hashSecretKey: process.env.TP_HASH_SECRET_KEY || "checkers",
         tokenExpirationTime: handleToNumberConversion(process.env.TP_TOKEN_EXPIRATION_TIME,15),
