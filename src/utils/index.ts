@@ -36,8 +36,11 @@ async function checkFileExists(filePath:string):Promise<boolean> {
         return false;
     }
 }
-const closeFile = (fd:number): Promise<string | NodeJS.ErrnoException>=>{
+const closeFile = (fd:any): Promise<string | NodeJS.ErrnoException>=>{
     return new Promise(($resolve,$reject)=>{
+        if(!fd){
+            $resolve('');   
+        }
         fs.close(fd,(err)=>{
             if(!err){
                 $resolve('');
