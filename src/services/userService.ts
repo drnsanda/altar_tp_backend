@@ -1,6 +1,6 @@
 
 
-import { createFile, createTokenFile, deleteTokenFile, generateRandomTokenKey, getFile, getServiceError, hashPassword } from '../utils';
+import { createFile, createTokenFile, deleteTokenFile, generateRandomTokenKey, getFile, getServiceError, getTokenFile, hashPassword } from '../utils';
 import config from '../config';
 import { ServiceError } from '../interfaces/errors';
 import path from 'path';
@@ -76,6 +76,19 @@ export const authUserService = async (email: string, securityAccess: string) => 
     return getServiceError(error);
   }
 
+}
+
+export const verifyUserTokenService = async (tokenId: string): Promise<boolean | ServiceError> => {
+  try {
+    const token = await getTokenFile(tokenId);
+    if(token?.expiresAt < new Date().getTime()){
+      return true; //USER_TOKEN_EXPIRED
+    }else{
+      return false; //USER_TOKEN_VALID
+    }
+  } catch (error) {
+    return getServiceError(error);
+  }
 }
 
 

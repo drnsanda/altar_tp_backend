@@ -26,7 +26,7 @@ app.listen(config.port,()=>{
     workers.init() ;     
     
     //Initiate Sockets
-    sockets.init();   
+    sockets.init(); 
 
     console.log("\x1b[32m::: [SERVER_CONNECTION_ESTABLISHED] ::: \x1b[0m",new Date().toLocaleDateString(),new Date().toLocaleTimeString()); 
     

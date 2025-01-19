@@ -1,7 +1,8 @@
 import WebSocket from 'ws';
 import config from '../config';
-import { createPaymentsService, generateGridService, getPaymentsHTMLService } from '../services/userService';
+import { createPaymentsService, generateGridService, getPaymentsHTMLService, verifyUserTokenService } from '../services/userService';
 import { ServiceError } from '../interfaces/errors';
+import { IncomingMessage } from 'http';
 
 const grid: {
   clients: number;
@@ -20,7 +21,7 @@ const payments: {
   cue: [] //CUE HOLDER FOR CLIENTS
 }
 
-const handleMessage = (payload: string, client: WebSocket,socket:WebSocket.Server) => {
+const handleMessage = (payload: string, client: WebSocket, socket: WebSocket.Server) => {
   let task: Partial<{ code: string, data: any }> = { code: "", data: {} };
   try {
     task = JSON.parse(payload);
@@ -47,13 +48,13 @@ const handleMessage = (payload: string, client: WebSocket,socket:WebSocket.Serve
         grid: task?.data?.grid
       }
       createPaymentsService(payment)
-      .then(()=>{
+        .then(() => {
           broadcast(socket, JSON.stringify({ status: "updating_payments" }));
-          client.send(JSON.stringify({status:"payment_completed",message:"Payment Completed"}));
-      })
-      .catch(()=>{
-        client.send(JSON.stringify({status:"payment_failed",message:"Failed to complete payment, please try again later"}));
-      })
+          client.send(JSON.stringify({ status: "payment_completed", message: "Payment Completed" }));
+        })
+        .catch(() => {
+          client.send(JSON.stringify({ status: "payment_failed", message: "Failed to complete payment, please try again later" }));
+        })
     }
   }
 }
@@ -94,28 +95,60 @@ const startLiveGrid = (socket: WebSocket.Server) => {
 };
 const startLivePayments = (socket: WebSocket.Server) => {
   setInterval(() => {
-    getPaymentsHTMLService().then((res:string | ServiceError)=>{
-      if(typeof res === 'string'){
+    getPaymentsHTMLService().then((res: string | ServiceError) => {
+      if (typeof res === 'string') {
         payments._html = res;
         broadcast(socket, JSON.stringify({
           status: "fetching_payments",
           html: payments._html
         }));
-      }else{
-        console.error("Failed to retrieve payment list ::: ",res);
+      } else {
+        console.error("Failed to retrieve payment list ::: ", res);
       }
     })
-  }, 1000 * config.paymentsRefreshTime);    
+  }, 1000 * config.paymentsRefreshTime);
 };
+
+const verifyClientAuthentication = (client:WebSocket,req:IncomingMessage)=>{
+    //Handle Web Socket Security
+    const url = new URL(req.url || '', `http://${req.headers.host}`);
+    const token = url.searchParams.get('token');
+
+    if (!token) {
+      client.close(4001, 'Unauthorized: Token not provided');
+      return;
+    }
+    verifyUserTokenService(token)
+      .then((res) => {
+        if (typeof res === 'boolean') {
+          if(res===true){
+            console.log("User is authorized::: ",res);  
+          }
+          if (res === false) {
+            client.close(4002, 'Unauthorized: Your token has expired please authenticate');
+          }
+        } else {
+          client.close(4005, 'ServiceError: Failed to validate your token');
+        }
+      })
+      .catch(() => {
+        client.close(4005, 'ServiceError: Failed to validate your token');
+      });
+    //!--Handle Web Socket Security
+}
 
 const initiateGridSocket = () => {
   const socket = new WebSocket.Server({ port: config.gridSocketPort });
   console.log('\x1b[35m::: [SOCKETS_GRID_INITIALIZED] :::\x1b[0m');
   startLiveGrid(socket);
   startLivePayments(socket);
-  socket.on('connection', (client) => {
+
+  socket.on('connection', (client: WebSocket, req: IncomingMessage) => {
+
+    verifyClientAuthentication(client,req);   
+
     client.on('message', (message: string) => {
-      handleMessage(message.toString(), client,socket);
+      handleMessage(message.toString(), client, socket);
     });
 
     client.on('error', (err: Error) => {
