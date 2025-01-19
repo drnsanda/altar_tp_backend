@@ -6,7 +6,6 @@ const router = express.Router();
 
 router.post('/auth', handlers.authUserHandler);
 router.post('/auth/logout/:id', handlers.logoutUserHandler); 
-router.post('/grid', handlers.generateGridHandler); 
 
 
 //Veriy Authentication      

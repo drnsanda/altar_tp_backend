@@ -1,6 +1,8 @@
 import WebSocket from 'ws';
 import config from '../config';
-import { createPaymentsService, generateGridService, getPaymentsHTMLService, verifyUserTokenService } from '../services/userService';
+import { verifyUserTokenService } from '../services/userService';
+import { createPaymentsService, getPaymentsHTMLService } from '../services/paymentService';
+import { generateGridService } from '../services/gridService';
 import { ServiceError } from '../interfaces/errors';
 import { IncomingMessage } from 'http';
 

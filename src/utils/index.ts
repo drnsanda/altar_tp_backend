@@ -208,7 +208,17 @@ const getServiceError = (error:any,type:string='Failed to perform service action
         type: type === '' ? 'Failed to perform service action': type,
         error
     }
-}         
+}   
+
+const sanitizeHtml = (input: any): string => {
+    if (!input) return "";
+    return String(input)
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;")
+      .replace(/&/g, "&amp;");
+  };
 
 const statusCodes = {
     OK: { code: 200, message: "OK" },
@@ -233,6 +243,7 @@ export {
     deleteTokenFile,
     getFile,
     getTokenFile,
+    sanitizeHtml,
     hashPassword,
     statusCodes,   
     getServiceError,
