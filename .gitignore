@@ -4,7 +4,6 @@
 #Worker Files
 src/tokens  
 src/temp
-src/__tests__
 
 # TypeScript output directory
 dist    
@@ -35,3 +34,6 @@ Thumbs.db
 # Build and runtime files
 *.tsbuildinfo
 *.swp
+
+#Tests
+coverage

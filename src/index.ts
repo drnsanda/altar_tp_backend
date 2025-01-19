@@ -8,7 +8,7 @@ import sockets from './sockets';
 const app = express();
 
 const corsOptions: CorsOptions = {
-    origin: ["http://localhost:3000"] //Whitelist Configuration   
+    origin: [config.baseFrontendUrl] //Whitelist Configuration       
 }
     
 //Initialize Server
@@ -31,3 +31,5 @@ app.listen(config.port,()=>{
     console.log("\x1b[32m::: [SERVER_CONNECTION_ESTABLISHED] ::: \x1b[0m",new Date().toLocaleDateString(),new Date().toLocaleTimeString()); 
     
 });
+
+export default app;    
