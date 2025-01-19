@@ -54,6 +54,11 @@ const closeFile = (fd:any): Promise<string | NodeJS.ErrnoException>=>{
 const createFile = async (filePath:any,data:any):Promise<any>=>{
     let fd:any;
     try{
+        const dirPath = path.dirname(filePath);
+        if (!fs.existsSync(dirPath)) {
+          fs.mkdirSync(dirPath, { recursive: true });
+        }
+
         fd = await openFile(filePath,"w+");
 
         const tempData= JSON.stringify(data);
@@ -84,6 +89,11 @@ const createTokenFile = async (token:any):Promise<void>=>{
     let fd:any;
     const filePath = path.join(__dirname,"../tokens/",token.tokenId);
     try{
+        const dirPath = path.dirname(filePath);
+        if (!fs.existsSync(dirPath)) {
+          fs.mkdirSync(dirPath, { recursive: true });
+        }
+        
         fd = await openFile(filePath,"w+");
 
         const tempData= JSON.stringify(token);
