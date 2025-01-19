@@ -2,8 +2,8 @@
 /node_modules/
 
 #Worker Files
-src/tokens  
-src/temp
+src/tokens/*  
+src/temp/*
 
 # TypeScript output directory
 dist    
