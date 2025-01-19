@@ -6,6 +6,7 @@ interface EnvironmentProfile{
     hashSecretKey:string;
     tokenExpirationTime:number;
     gridRefreshTime:number;
+    paymentsRefreshTime:number;
     defaultWorkerIntervalTime:number;
     baseFrontendUrl:string;
     gridSocketPort:number;
@@ -24,6 +25,7 @@ const environments:{[key:string] : EnvironmentProfile} = {
         hashSecretKey: process.env.TP_HASH_SECRET_KEY || "checkers",
         tokenExpirationTime: handleToNumberConversion(process.env.TP_TOKEN_EXPIRATION_TIME,15),
         gridRefreshTime: handleToNumberConversion(process.env.TP_GRID_REFRESH_TIME,2),
+        paymentsRefreshTime: handleToNumberConversion(process.env.TP_PAYMENTS_REFRESH_TIME,2),
         defaultWorkerIntervalTime: handleToNumberConversion(process.env.TP_DEFAULT_WORKER_INTERVAL_TIME,900),
         baseFrontendUrl:process.env.TP_BASE_FRONTEND_URL || "http://localhost:3000/"   
     },
@@ -34,6 +36,7 @@ const environments:{[key:string] : EnvironmentProfile} = {
         hashSecretKey: process.env.TP_HASH_SECRET_KEY || "checkers",
         tokenExpirationTime: handleToNumberConversion(process.env.TP_TOKEN_EXPIRATION_TIME,15),
         gridRefreshTime: handleToNumberConversion(process.env.TP_GRID_REFRESH_TIME,2),
+        paymentsRefreshTime: handleToNumberConversion(process.env.TP_PAYMENTS_REFRESH_TIME,2),
         defaultWorkerIntervalTime: handleToNumberConversion(process.env.TP_DEFAULT_WORKER_INTERVAL_TIME,900),
         baseFrontendUrl:process.env.TP_BASE_FRONTEND_URL || "https://www.altar.io/live-grid"     
     }          

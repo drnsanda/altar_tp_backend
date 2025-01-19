@@ -48,6 +48,35 @@ const closeFile = (fd:number): Promise<string | NodeJS.ErrnoException>=>{
     });
 }
 
+const createFile = async (filePath:any,data:any):Promise<any>=>{
+    let fd:any;
+    try{
+        fd = await openFile(filePath,"w+");
+
+        const tempData= JSON.stringify(data);
+        
+       const result = await new Promise(($resolve,$reject)=>{
+            fs.writeFile(fd,tempData,(err)=>{
+                if(!err){
+                    $resolve({status:"created"});
+                }else{
+                    $reject(err);
+                }
+            })
+        });
+        
+        await closeFile(fd);
+
+        return result;
+
+    }catch(error){
+        if(fd!==null){
+            await closeFile(fd);
+        }    
+        console.error(error);
+        throw new Error('FAILURE_CREATE_FILE');   
+    }   
+}
 const createTokenFile = async (token:any):Promise<void>=>{
     let fd:any;
     const filePath = path.join(__dirname,"../tokens/",token.tokenId);
@@ -77,6 +106,26 @@ const createTokenFile = async (token:any):Promise<void>=>{
     }   
 }
 
+const deleteFile = async (filePath:string): Promise<void>=>{
+    try{
+        const isFileAvailable= await checkFileExists(filePath);
+        if(!isFileAvailable){
+            return;
+        }      
+        await new Promise(($resolve,$reject)=>{
+            fs.unlink(filePath,(err)=>{
+                if(!err){
+                    $resolve('deleted');
+                }else{
+                    $reject(err);
+                }
+            })
+        })
+    }catch(error){
+        console.error(error);   
+        console.log("FAILURE_DELETE_TOKEN_FILE");
+    }
+}   
 const deleteTokenFile = async (token:string): Promise<void>=>{
     try{
         const filename = path.resolve(__dirname,"../tokens/",token);
@@ -99,6 +148,26 @@ const deleteTokenFile = async (token:string): Promise<void>=>{
     }
 }   
 
+const getFile = async (filePath:string)=>{
+    try{        
+        const data:string = await new Promise(($resolve,$reject)=>{
+            fs.readFile(filePath,'utf-8',(err: NodeJS.ErrnoException | null,data:string)=>{
+                if(!err){
+                    $resolve(data);
+                }else{
+                    $reject(null);
+                }
+            })
+        });
+        if(isJsonData(data)){
+            return JSON.parse(data);
+        }else{
+            return null;
+        }
+    }catch(error){
+        return null;
+    }   
+}
 const getTokenFile = async (token:string)=>{
     const filePath = path.join(__dirname,"../tokens/",token);
     try{        
@@ -158,8 +227,11 @@ const statusCodes = {
 
 export {       
     isJsonData,
+    createFile,
     createTokenFile,
+    deleteFile,
     deleteTokenFile,
+    getFile,
     getTokenFile,
     hashPassword,
     statusCodes,   
