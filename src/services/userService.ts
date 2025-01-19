@@ -86,10 +86,13 @@ export const authUserService = async (email: string, securityAccess: string) => 
 export const verifyUserTokenService = async (tokenId: string): Promise<boolean | ServiceError> => {
   try {
     const token = await getTokenFile(tokenId);
-    if(token?.expiresAt < new Date().getTime()){
-      return true; //USER_TOKEN_EXPIRED
+    if(!token){
+      return false;
+    }
+    else if(token?.expiresAt < new Date().getTime()){
+      return false; //USER_TOKEN_EXPIRED
     }else{
-      return false; //USER_TOKEN_VALID
+      return true; //USER_TOKEN_VALID
     }
   } catch (error) {
     return getServiceError(error);
