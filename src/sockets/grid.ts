@@ -121,9 +121,6 @@ const verifyClientAuthentication = (client:WebSocket,req:IncomingMessage)=>{
     verifyUserTokenService(token)
       .then((res) => {
         if (typeof res === 'boolean') {
-          if(res===true){
-            console.log("User is authorized::: ",res);  
-          }
           if (res === false) {
             client.close(4002, 'Unauthorized: Your token has expired please authenticate');
           }
