@@ -5,6 +5,7 @@ import config from '../config';
 import { ServiceError } from '../interfaces/errors';
 import path from 'path';
 import { error } from 'console';
+import { validateUser } from '../data/users';
 
 const PAYMENTS_FILE_PATH = path.join(__dirname, "../temp/payments.json");
 
@@ -34,7 +35,7 @@ export const logoutUserService = async (id: string, token: string): Promise<{ st
 export const authUserService = async (email: string, securityAccess: string) => {
   try {
 
-    const user: any = {}; //TODO: GET USER BY E-MAIL FROM MOCK DATA       
+    const user: any = validateUser(email)?.user;   
 
     if (!user || (user.securityAccess != hashPassword(securityAccess))) {
       throw new Error('INVALID_CREDENTIALS');
@@ -63,7 +64,11 @@ export const authUserService = async (email: string, securityAccess: string) => 
     await createTokenFile(token);
 
     return {
-      document: user //TODO: Remove sensible data
+      document: {
+        ...user,
+        securityAccess:null,
+        token
+      }
     }
 
   } catch (error: any) {
