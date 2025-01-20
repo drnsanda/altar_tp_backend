@@ -28,6 +28,12 @@ jobs:
       - name: Tests
         run: npm test
 
+      # Install the Heroku CLI
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+          sudo ln -s /usr/local/heroku/bin/heroku /usr/bin/heroku
+
       # Deploy to Heroku
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
