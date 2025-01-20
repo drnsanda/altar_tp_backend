@@ -18,15 +18,20 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18  # Set your Node.js version here
+          node-version: 22  
 
       # Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Build the project (optional if your project requires a build step)
+      # Tests
+      - name: Tests
+        run npm test
+
+      # Build the project 
       - name: Build project
         run: npm run build
+
 
       # Deploy to Heroku
       - name: Deploy to Heroku
