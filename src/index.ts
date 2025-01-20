@@ -25,7 +25,9 @@ server.listen(config.port,()=>{
     configureRouter(app);
 
     //Initiate Workers
-    workers.init() ;     
+    if(process.env.TEST_MODE!='active'){
+        workers.init() ;   
+    }  
     
     //Initiate Sockets
     sockets.init(); 
