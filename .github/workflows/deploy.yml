@@ -28,11 +28,6 @@ jobs:
       - name: Tests
         run: npm test
 
-      # Build the project 
-      - name: Build project
-        run: npm run build
-
-
       # Deploy to Heroku
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
